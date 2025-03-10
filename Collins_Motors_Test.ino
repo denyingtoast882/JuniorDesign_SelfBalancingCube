@@ -96,7 +96,7 @@ void loop()
   digitalWrite(BRAKE, HIGH);  // brake on
   delay(50);                  // 50 ms delay
   digitalWrite(BRAKE,LOW);    // brake off
-
+  delay(50);                  // 50 ms delay
 }
 
 // functions
