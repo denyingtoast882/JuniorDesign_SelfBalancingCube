@@ -32,10 +32,10 @@
 
 // function prototypes
 void pwmSet(uint8_t channel, uint8_t duty);  // sets pwm duty cylce in a certain channel
-void Motor1_control(uint8_t speed);          // sets speed and direction for motor 1, - = ccw, 0 <= speed <= 255
-void Motor2_control(uint8_t speed);          // sets speed and direction for motor 2, - = ccw, 0 <= speed <= 255
-void Motor2_control(uint8_t speed);          // sets speed and direction for motor 3, - = ccw, 0 <= speed <= 255
-void MotorAll_control(uint8_t speed);        // setes speed and direction for all motors, - = ccw, 0 <= speed <= 255
+void Motor1_control(uint8_t speed, bool direction);          // sets speed and direction for motor 1, 0 = ccw, 0 <= speed <= 255
+void Motor2_control(uint8_t speed, bool direction);          // sets speed and direction for motor 2, 0 = ccw, 0 <= speed <= 255
+void Motor2_control(uint8_t speed, bool direction);          // sets speed and direction for motor 3, 0 = ccw, 0 <= speed <= 255
+void MotorAll_control(uint8_t speed, bool direction);        // setes speed and direction for all motors, 0 = ccw, 0 <= speed <= 255
 
 void setup()
 {
@@ -67,36 +67,52 @@ void setup()
 // main
 void loop()
 {
+  digitalWrite(BRAKE, HIGH);  // brake off
   // motor 1 routine
-  Motor1_control(127);        // motor 1 half speed, cw
-  Motor1_control(-127);       // motor 1 half speed, ccw
-  Motor1_control(255);        // motor 1 full speed, cw
-  Motor1_control(-255);       // motor 1 full speed, ccw
-  Motor1_control(0);          // motor 1 no speed
-  delay(100);                  // 100 ms delay?
+  Motor1_control(127, 0);        // motor 1 half speed, ccw
+  delay(1000);
+  Motor1_control(127, 1);       // motor 1 half speed, cw
+  delay(1000);
+  Motor1_control(255, 0);        // motor 1 full speed, ccw
+  delay(1000);
+  Motor1_control(255, 1);       // motor 1 full speed, cw
+  delay(1000);
+  Motor1_control(1, 0);          // motor 1 no speed
+  delay(1000);                 
   // motor 2 routine
-  Motor2_control(127);        // motor 2 half speed, cw
-  Motor2_control(-127);       // motor 2 half speed, ccw
-  Motor2_control(255);        // motor 2 full speed, cw
-  Motor2_control(-255);       // motor 2 full speed, ccw
-  Motor2_control(0);          // motor 2 no speed
-  delay(100);
+  Motor2_control(127, 0);       // motor 2 half speed, cw
+  delay(1000);
+  Motor2_control(127, 1);       // motor 2 half speed, ccw
+  delay(1000);
+  Motor2_control(255, 0);       // motor 2 full speed, cw
+  delay(1000);
+  Motor2_control(255, 1);       // motor 2 full speed, ccw
+  delay(1000);
+  Motor2_control(0, 0);         // motor 2 no speed
+  delay(1000);           
   // motor 3 routine
-  Motor3_control(127);        // motor 3 half speed, cw
-  Motor3_control(-127);       // motor 3 half speed, ccw
-  Motor3_control(255);        // motor 3 full speed, cw
-  Motor3_control(-255);       // motor 3 full speed, ccw
-  Motor3_control(0);          // motor 3 no speed
-  delay(100);
+  Motor3_control(127, 0);       // motor 3 half speed, cw
+  delay(1000);
+  Motor3_control(127, 1);       // motor 3 half speed, ccw
+  delay(1000);
+  Motor3_control(255, 0);       // motor 3 full speed, cw
+  delay(1000);
+  Motor3_control(255, 1);       // motor 3 full speed, ccw
+  delay(1000);
+  Motor3_control(0, 0);         // motor 3 no speed
+  delay(1000);           
   // all motor routine
-  MotorAll_control(127);      // all motors half speed, cw
-  MotorAll_control(-127);     // all motors half speed, ccw
-  MotorAll_control(255);      // all motors full speed, cw
-  MotorAll_control(-255);     // all mototrs full speed, ccw
-  digitalWrite(BRAKE, HIGH);  // brake on
-  delay(50);                  // 50 ms delay
-  digitalWrite(BRAKE,LOW);    // brake off
-  delay(50);                  // 50 ms delay
+  MotorAll_control(127,0);      // all motors half speed, cw
+  delay(1000);
+  MotorAll_control(127, 1);     // all motors half speed, ccw
+  delay(1000);
+  MotorAll_control(255,0);      // all motors full speed, cw
+  delay(1000);
+  MotorAll_control(255,1);     // all mototrs full speed, ccw
+  delay(1000);          
+  //digitalWrite(BRAKE,LOW);    // brake on
+  //delay(1000);                  
+
 }
 
 // functions
@@ -105,36 +121,36 @@ void pwmSet(uint8_t channel, uint8_t duty)
   ledcWrite(channel, duty);  // essentially the same function as 'pwmSet' but without the 'uint8_t' needing to be typed everytime
 }
 
-void Motor1_control(uint8_t speed)
+void Motor1_control(uint8_t speed, bool direction)
 {
-  if (speed > 0){
-    digitalWrite(DIR1, LOW);}       // if speed is +, cw
+  if (direction == 0){
+    digitalWrite(DIR1, LOW);}       // if speed is +, ccw
   else{
-    digitalWrite(DIR1, HIGH);}      // if speed is -, ccw
-  pwmSet(PWM1_CH, 255-abs(speed));  // sets speed of motor. lower = higher?
+    digitalWrite(DIR1, HIGH);}      // if speed is -, cw
+  ledcWrite(PWM1, 255-speed);  // sets speed of motor. lower = higher?
 }
 
-void Motor2_control(uint8_t speed)
+void Motor2_control(uint8_t speed, bool direction)
 {
-  if (speed > 0){
+  if (direction == 0){
     digitalWrite(DIR2, LOW);}       // if speed is +, cw
   else{
     digitalWrite(DIR2, HIGH);}      // if speed is -, ccw
-  pwmSet(PWM2_CH, 255-abs(speed));  // sets speed of motor. lower = higher?
+  ledcWrite(PWM2, 255-speed);  // sets speed of motor. lower = higher?
 }
 
-void Motor3_control(uint8_t speed)
+void Motor3_control(uint8_t speed, bool direction)
 {
-  if (speed > 0){
+  if (direction == 0){
     digitalWrite(DIR3, LOW);}       // if speed is +, cw
   else{
     digitalWrite(DIR3, HIGH);}      // if speed is -, ccw
-  pwmSet(PWM3_CH, 255-abs(speed));  // sets speed of motor. lower = higher?
+  ledcWrite(PWM3, 255-speed);  // sets speed of motor. lower = higher?
 }
 
-void MotorAll_control(uint8_t speed)
+void MotorAll_control(uint8_t speed, bool direction)
 {
-  if (speed > 0){
+  if (direction == 0){
     digitalWrite(DIR1, LOW);        // if speed is +, cw
     digitalWrite(DIR2, LOW);
     digitalWrite(DIR3, LOW);}       
@@ -142,7 +158,7 @@ void MotorAll_control(uint8_t speed)
     digitalWrite(DIR1, HIGH);       // if speed is -, ccw
     digitalWrite(DIR2, HIGH);
     digitalWrite(DIR3, HIGH);}      
-  pwmSet(PWM1_CH, 255-abs(speed));  // sets speed of motor. lower = higher?
-  pwmSet(PWM2_CH, 255-abs(speed));
-  pwmSet(PWM3_CH, 255-abs(speed));  
+  ledcWrite(PWM1, 255-speed);  // sets speed of motor. lower = higher?
+  ledcWrite(PWM2, 255-speed);
+  ledcWrite(PWM3, 255-speed);  
 }
